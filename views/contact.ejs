@@ -1,0 +1,38 @@
+<div class="container">
+  <div class="contact-list" style="margin-top: 30px">
+    <h2 style="text-align: left">Daftar Kontak</h2>
+    <a href="/contact/add" class="card-link btn btn-success mb-3 fw-bold" style="text-decoration: none">Tambah Data</a>
+
+    <!-- Melakukan pengkondisian untuk memastikan data tersedia atau tidak -->
+
+    <% if (contacts) { %>
+    <table class="table table-striped table-hover table-bordered">
+      <thead>
+        <tr>
+          <th scope="row" data-id="id">No</th>
+          <!-- Menambah kolom No. dengan diberi atribut id -->
+          <th>Nama</th>
+          <th>Nomor Telepon</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!--Melakukan perulangan untuk menampilkan data contact jika tersedia-->
+        <% contacts.forEach((contact, index) => { index++ %>
+        <tr>
+          <th scope="row"><%= index++ %></th>
+          <td><%= contact.nama %></td>
+          <td><%= contact.mobile %></td>
+          <td>
+            <a href="/contact/<%= contact.nama %>" class="btn btn-success badge rounded-pill"><i class="bi bil-info-circle"></i>Detail</a>
+          </td>
+        </tr>
+        <% }); %>
+      </tbody>
+    </table>
+    <!-- Jika data tidak tersedia akan menampilkan variabel pesan dari route app.get(/contact)-->
+    <% } else { %>
+    <h5 style="text-align: center"><%= pesan %></h5>
+    <% } %>
+  </div>
+</div>
