@@ -38,4 +38,10 @@ const tambahData = (contact) => {
   saveData(contacts);
 };
 
-module.exports = { detailData, ambilData, tambahData };
+// membuat validator nama, jika data nama sudah tersedia
+const cekNama = (nama) => {
+  const contacts = ambilData();
+  return (contact = contacts.find((contact) => contact.nama.toLowerCase() === nama.toLowerCase()));
+};
+
+module.exports = { detailData, ambilData, tambahData, cekNama };

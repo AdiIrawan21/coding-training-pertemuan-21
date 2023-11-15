@@ -2,15 +2,14 @@ const express = require("express"); // import module express.js
 const app = express(); // membuat aplikasi express
 const expressLayouts = require("express-ejs-layouts"); // import module express-ejs-layouts
 const host = "localhost";
-const port = 3001; // konfigurasi port
-const { ambilData, detailData, tambahData } = require("./utility/function"); //import module function.js yang berisi file contact.json
+const port = 3000; // konfigurasi port
+const { ambilData, detailData, tambahData, cekNama } = require("./utility/function"); //import module function.js
+const { body, validationResult } = require("express-validator"); // import module express validator, untuk melakukan unique pada data nama
 
 app.set("view engine", "ejs"); //informasi menggunakan ejs
-
 app.use(expressLayouts); // Mengaktifkan fitur layout
-
 app.use(express.static("views")); // untuk memanggil folder/file css, javascript.
-app.use(express.urlencoded()); //menggunakan middleware express.urlencoded().
+app.use(express.urlencoded({ extended: true })); //menggunakan middleware express.urlencoded().
 
 // route ke halaman index/home
 app.get("/", (req, res) => {
@@ -65,10 +64,38 @@ app.get("/contact/add", (req, res) => {
 });
 
 //data contact proccess
-app.post("/contact", (req, res) => {
-  tambahData(req.body);
-  res.redirect("/contact");
-});
+app.post(
+  "/contact",
+  // melakukan pengecekan data nama, jika data nama sudah tersedia di daftar contact.json
+  [
+    body("nama").custom((value) => {
+      const cek = cekNama(value); // deklarasi variabel cek untuk mengetahui apakah ada duplikat atau tidak
+      console.log(cek);
+
+      // melakukan pengkondisian pada variabel cekNama
+      if (cek) {
+        throw new Error("Data Nama sudah terdaftar."); // jika nama yang diinputkan pada form sudah terdaftar maka akan muncul pesan
+      } else {
+        return true; // jika belum terdaftar, maka akan mengembalikan nilai true
+      }
+    }),
+  ],
+  (req, res) => {
+    const errors = validationResult(req); // akan mengambil hasil validasi dari middleware express-validator.
+    //akan memeriksa apakah objek errors kosong. Jika tidak kosong, berarti ada kesalahan validasi.
+    if (!errors.isEmpty()) {
+      title = "Page Add Contact";
+      res.render("add-contact", {
+        layout: "layout/main",
+        errors: errors.array(), // akan merender tampilan "add-contact" lagi, dengan meneruskan array kesalahan validasi ke tampilan.
+      });
+    } else {
+      // jika tidak, akan memanggil fungsi tambahData() untuk menambahkan data kontak baru ke contacts.json
+      tambahData(req.body);
+      res.redirect("/contact");
+    }
+  }
+);
 
 // route ke halaman detail dari contact
 app.get("/contact/:nama", (req, res) => {
