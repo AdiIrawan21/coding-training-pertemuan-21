@@ -88,6 +88,7 @@ app.post(
     const errors = validationResult(req); // akan mengambil hasil validasi dari middleware express-validator.
     if (!errors.isEmpty()) {
       res.render("add-contact", {
+        title: "Page Add Data",
         layout: "layout/main",
         errors: errors.array(), // akan merender tampilan "add-contact" lagi, dengan meneruskan array kesalahan validasi ke tampilan.
       });
@@ -121,12 +122,12 @@ app.get("/contact/delete/:nama", (req, res) => {
 
 // form ubah data contact
 app.get("/contact/update/:nama", (req, res) => {
-  const contacts = findData(req.params.nama);
+  const contact = findData(req.params.nama);
 
   res.render("update-contact", {
     title: "Page Edit Contact",
     layout: "layout/main",
-    contacts,
+    contact,
   });
 });
 
@@ -140,12 +141,11 @@ app.post(
       // melakukan pengkondisian pada variabel cek
       if (value !== req.body.oldNama && cek) {
         throw new Error("Data Nama sudah terdaftar."); // jika nama yang diinputkan pada form sudah terdaftar maka akan muncul pesan
-      } else {
-        return true; // jika belum terdaftar, maka akan mengembalikan nilai true
       }
+      return true; // jika belum terdaftar, maka akan mengembalikan nilai true
     }),
     // validasi email dan mobile
-    check("mobile", "Phone Number is Wrong.").isMobilePhone(),
+    check("mobile", "Phone Number is Wrong.").isMobilePhone("id-ID"),
     check("email", "Email format is wrong.").isEmail(),
   ],
   (req, res) => {
