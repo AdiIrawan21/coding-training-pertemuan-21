@@ -21,9 +21,9 @@ const ambilData = () => {
 };
 
 // menampilkan detail data
-const detailData = (nama) => {
+const findData = (nama) => {
   const contacts = ambilData();
-  const contact = contacts.find((contact) => contact.nama.toLowerCase() === nama.toLowerCase());
+  const contact = contacts.find((contact) => contact.nama === nama);
   return contact;
 };
 
@@ -31,6 +31,7 @@ const detailData = (nama) => {
 const saveData = (contacts) => {
   fs.writeFileSync(dataPath, JSON.stringify(contacts));
 };
+
 // menambahkan data contact
 const tambahData = (contact) => {
   const contacts = ambilData();
@@ -38,10 +39,26 @@ const tambahData = (contact) => {
   saveData(contacts);
 };
 
+// function untuk delete data
+const hapusData = (nama) => {
+  const contacts = ambilData();
+  const contact = contacts.filter((contact) => contact.nama !== nama);
+  saveData(contact);
+};
+
+// function untuk update data
+const updateData = (newContact) => {
+  const contacts = ambilData();
+  const contactFilter = contacts.filter((contact) => contact.nama !== newContact.oldNama);
+  delete newContact.oldNama;
+  contactFilter.push(newContact);
+  saveData(contactFilter);
+};
+
 // membuat validator nama, jika data nama sudah tersedia
 const cekNama = (nama) => {
   const contacts = ambilData();
-  return (contact = contacts.find((contact) => contact.nama.toLowerCase() === nama.toLowerCase()));
+  return (contact = contacts.find((contact) => contact.nama === nama));
 };
 
-module.exports = { detailData, ambilData, tambahData, cekNama };
+module.exports = { findData, ambilData, tambahData, cekNama, hapusData, updateData };
